@@ -14,11 +14,14 @@ with codecs.open("Chinese text corpus.txt",'r',encoding='UTF-8') as corpus:     
             print("There are "+str(lines)+" lines in the 'Chinese text corpus.txt'.")
             linesForTraining=int(lines*0.9)                                     #训练语料行数
             print("In these lines, the first "+str(linesForTraining)+" lines are used for training, and the rest are for testing.")
+            print("***********************************************************************************************")
             corpus.seek(0)                                                      #指针回至文件头
             counter=0
             for line in corpus.readlines():
-                if len(line)>0:                                                 #跳过空行
+                line=line[:-1]
+                if len(line)>23:                                                #跳过空行
                     sentence=re.split(r'\s+',line[23:])                         #除去空格，提取出词/词性
+                    sentence.remove('')
                     if counter<linesForTraining:                                #处于训练语料部分
                         for i in range(0,len(sentence)):
                             word=re.split('/',sentence[i])                      #除去词性，提取出词
@@ -37,46 +40,69 @@ with codecs.open("Chinese text corpus.txt",'r',encoding='UTF-8') as corpus:     
         test.close()                                                            #关闭语料文件
     train.close()
 corpus.close()
-print("\nThe corpus segmentation has been over.")
+print(">>                          The corpus segmentation has been over.                           <<")
+print("***********************************************************************************************")
 
 
 
-uniDict={}
-biDict={}
-triDict={}
+uniDict={}                                                                      #unigram词典
+biDict={}                                                                       #bigram词典
+triDict={}                                                                      #trigram词典
 
-
-with codecs.open("train.txt",'r',encoding='UTF-8') as train:
-    for line in train.readlines():
-        sentence=re.split(r'\s+',line)
-        for i in range(0,len(sentence)):
-            word=sentence[i]
-            if word in uniDict:
-                uniDict[word]+=1
-            else:
-                uniDict[word]=1
-            if i<len(sentence)-1:
-                word+='|'+sentence[i+1]
-                if word in biDict:
-                     biDict[word]+=1
-                else:
-                    biDict[word]=1
-                if i<len(sentence)-2:
-                    word+='|'+sentence[i+2]
-                    if word in triDict:
-                        triDict[word]+=1
-                    else:
-                        triDict[word]=1
-                else:
-                    word+="|$"
-                    if word in triDict:
-                        triDict[word]+=1
-                    else:
-                        triDict[word]=1
-            else:
-                word+="|$"
-                if word in biDict:
-                    biDict[word]+=1
-                else:
-                    biDict[word]=1
-                
+with codecs.open("train.txt",'r',encoding='UTF-8') as train:                    #打开训练语料
+    with codecs.open("uniDict.txt",'w',encoding='UTF-8') as uniDictFile:        #打开词典文件
+        with codecs.open("biDict.txt",'w',encoding='UTF-8') as biDictFile:
+            with codecs.open("triDict.txt",'w',encoding='UTF-8') as triDictFile:
+                for line in train.readlines():
+                    sentence=re.split(r'\s+',line)                              #除去空格，提取出词
+                    sentence.insert(0,"start")                                  #插入start
+                    sentence.remove('')
+                    for i in range(0,len(sentence)):
+                        word=sentence[i]
+                        if word in uniDict:                                     #生成unigram词典
+                            uniDict[word]+=1
+                        else:
+                            uniDict[word]=1
+                        if i<len(sentence)-1:                                   #生成bigram词典
+                            word=sentence[i+1]+'|'+word
+                            if word in biDict:
+                                 biDict[word]+=1
+                            else:
+                                biDict[word]=1
+                            if i<len(sentence)-2:                               #生成trigram词典
+                                word=sentence[i+2]+'|'+word
+                                if word in triDict:
+                                    triDict[word]+=1
+                                else:
+                                    triDict[word]=1
+                            else:
+                                word="$|"+word
+                                if word in triDict:
+                                    triDict[word]+=1
+                                else:
+                                    triDict[word]=1
+                        else:
+                            word="$|"+word
+                            if word in biDict:
+                                biDict[word]+=1
+                            else:
+                                biDict[word]=1
+                dictionary=uniDict.items()
+                dictionary=sorted(dictionary)
+                for key,value in dictionary:                                    #写入unigram词典文件
+                    if key is not "start":
+                        uniDictFile.write(key+"\t"+str(value)+"\r\n")
+                dictionary=biDict.items()
+                dictionary=sorted(dictionary)
+                for key,value in dictionary:                                    #写入bigram词典文件
+                    biDictFile.write(key+"\t"+str(value)+"\r\n")
+                dictionary=triDict.items()
+                dictionary=sorted(dictionary)
+                for key,value in dictionary:                                    #写入trigram词典文件
+                    triDictFile.write(key+"\t"+str(value)+"\r\n")
+            triDictFile.close()                                                 #关闭词典文件
+        biDictFile.close()
+    uniDictFile.close()
+train.close()                                                                   #关闭训练语料
+print(">>                        The dictionary of model has been generated.                        <<")
+print("***********************************************************************************************")
