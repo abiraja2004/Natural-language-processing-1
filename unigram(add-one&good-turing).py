@@ -27,6 +27,7 @@ class unigram:
         v=0
         for line in file.readlines():
             word=re.split(r'\s+',line)
+            word.remove("")
             v+=int(word[1])
         file.close()                                            #关闭词典文件
         return v
@@ -37,6 +38,7 @@ class unigram:
         dictionary={}
         for line in file.readlines():
             word=re.split(r'\s+',line)
+            word.remove("")
             dictionary[word[0]]=word[1]
         dictionary["<unknown>"]=0                               #预留项
         file.close()                                            #关闭词典文件
@@ -56,6 +58,7 @@ class unigram:
         file=open("test.txt",'r')                               #打开测试文件
         for line in file.readlines():
             words=re.split(r'\s+',line)
+            words.remove("")
             testV+=len(words)                                   #获取测试文件词表大小
             for i in range(0,len(words)):                       #计算测试语料出现概率
                 if words[i] in smoothDict:
@@ -91,6 +94,7 @@ class unigram:
         file=open("test.txt",'r')                               #打开测试文件
         for line in file.readlines():
             words=re.split(r'\s+',line)
+            words.remove("")
             testV+=len(words)                                   #获取测试文件词表大小
             for i in range(0,len(words)):                       #计算测试语料出现概率
                 if words[i] in smoothDict:
@@ -103,6 +107,7 @@ class unigram:
 
 
 
+print(">>                                          unigram                                          <<")
 gram=unigram()                                                  #创建对象
 print("***********************************************************************************************")
 gram.add_one()                                                  #Add-one平滑

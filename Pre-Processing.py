@@ -4,7 +4,7 @@ import re
 
 
 
-#分割语料，前95%用于训练，剩余作为测试
+#分割语料，前90%用于训练，剩余作为测试
 with codecs.open("Chinese text corpus.txt",'r',encoding='UTF-8') as corpus:     #打开语料文件
     with codecs.open("train.txt",'w',encoding='UTF-8') as train:
         with codecs.open("test.txt",'w',encoding='UTF-8') as test:
@@ -12,7 +12,7 @@ with codecs.open("Chinese text corpus.txt",'r',encoding='UTF-8') as corpus:     
             for line in corpus.readlines():                                     #统计语料总行数
                 lines+=1
             print("There are "+str(lines)+" lines in the 'Chinese text corpus.txt'.")
-            linesForTraining=int(lines*0.95)                                    #训练语料行数
+            linesForTraining=int(lines*0.9)                                    #训练语料行数
             print("In these lines, the first "+str(linesForTraining)+" lines are used for training, and the rest are for testing.")
             print("***********************************************************************************************")
 
@@ -66,25 +66,25 @@ with codecs.open("train.txt",'r',encoding='UTF-8') as train:                    
                         else:
                             uniDict[word]=1
                         if i<len(sentence)-1:                                   #生成bigram词典
-                            word=sentence[i+1]+'|'+word
+                            word=sentence[i+1]+'/'+word
                             if word in biDict:
                                  biDict[word]+=1
                             else:
                                 biDict[word]=1
                             if i<len(sentence)-2:                               #生成trigram词典
-                                word=sentence[i+2]+'|'+word
+                                word=sentence[i+2]+'/'+word
                                 if word in triDict:
                                     triDict[word]+=1
                                 else:
                                     triDict[word]=1
                             else:
-                                word="$|"+word
+                                word="end/"+word
                                 if word in triDict:
                                     triDict[word]+=1
                                 else:
                                     triDict[word]=1
                         else:
-                            word="$|"+word
+                            word="end/"+word
                             if word in biDict:
                                 biDict[word]+=1
                             else:
