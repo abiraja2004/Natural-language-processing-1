@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*                                                          #语料为中文，采用UTF-8编解码
-
 import codecs
 import re
 
 
-#分割语料，前90%用于训练，剩余作为测试
+
+#分割语料，前95%用于训练，剩余作为测试
 with codecs.open("Chinese text corpus.txt",'r',encoding='UTF-8') as corpus:     #打开语料文件
     with codecs.open("train.txt",'w',encoding='UTF-8') as train:
         with codecs.open("test.txt",'w',encoding='UTF-8') as test:
@@ -12,9 +12,10 @@ with codecs.open("Chinese text corpus.txt",'r',encoding='UTF-8') as corpus:     
             for line in corpus.readlines():                                     #统计语料总行数
                 lines+=1
             print("There are "+str(lines)+" lines in the 'Chinese text corpus.txt'.")
-            linesForTraining=int(lines*0.9)                                     #训练语料行数
+            linesForTraining=int(lines*0.95)                                    #训练语料行数
             print("In these lines, the first "+str(linesForTraining)+" lines are used for training, and the rest are for testing.")
             print("***********************************************************************************************")
+
             corpus.seek(0)                                                      #指针回至文件头
             counter=0
             for line in corpus.readlines():
@@ -37,6 +38,7 @@ with codecs.open("Chinese text corpus.txt",'r',encoding='UTF-8') as corpus:     
                                 test.write(" ")
                         test.write("\r\n")
                 counter+=1
+
         test.close()                                                            #关闭语料文件
     train.close()
 corpus.close()
@@ -87,6 +89,7 @@ with codecs.open("train.txt",'r',encoding='UTF-8') as train:                    
                                 biDict[word]+=1
                             else:
                                 biDict[word]=1
+
                 dictionary=uniDict.items()
                 dictionary=sorted(dictionary)
                 for key,value in dictionary:                                    #写入unigram词典文件
@@ -100,9 +103,10 @@ with codecs.open("train.txt",'r',encoding='UTF-8') as train:                    
                 dictionary=sorted(dictionary)
                 for key,value in dictionary:                                    #写入trigram词典文件
                     triDictFile.write(key+"\t"+str(value)+"\r\n")
+
             triDictFile.close()                                                 #关闭词典文件
         biDictFile.close()
     uniDictFile.close()
 train.close()                                                                   #关闭训练语料
-print(">>                        The dictionary of model has been generated.                        <<")
+print(">>                       The dictionaries of model has been generated.                       <<")
 print("***********************************************************************************************")
