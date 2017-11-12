@@ -12,7 +12,7 @@ with codecs.open("Chinese text corpus.txt",'r',encoding='UTF-8') as corpus:     
             for line in corpus.readlines():                                     #统计语料总行数
                 lines+=1
             print("There are "+str(lines)+" lines in the 'Chinese text corpus.txt'.")
-            linesForTraining=int(lines*0.9)                                    #训练语料行数
+            linesForTraining=int(lines*0.9)                                     #训练语料行数
             print("In these lines, the first "+str(linesForTraining)+" lines are used for training, and the rest are for testing.")
             print("***********************************************************************************************")
 
@@ -57,8 +57,8 @@ with codecs.open("train.txt",'r',encoding='UTF-8') as train:                    
             with codecs.open("triDict.txt",'w',encoding='UTF-8') as triDictFile:
                 for line in train.readlines():
                     sentence=re.split(r'\s+',line)                              #除去空格，提取出词
-                    sentence.insert(0,"start")                                  #插入start
                     sentence.remove('')
+                    sentence.insert(0,"start")                                  #插入start
                     for i in range(0,len(sentence)):
                         word=sentence[i]
                         if word in uniDict:                                     #生成unigram词典
@@ -78,13 +78,13 @@ with codecs.open("train.txt",'r',encoding='UTF-8') as train:                    
                                 else:
                                     triDict[word]=1
                             else:
-                                word="end/"+word
+                                word="$/"+word
                                 if word in triDict:
                                     triDict[word]+=1
                                 else:
                                     triDict[word]=1
                         else:
-                            word="end/"+word
+                            word="$/"+word
                             if word in biDict:
                                 biDict[word]+=1
                             else:
@@ -95,10 +95,12 @@ with codecs.open("train.txt",'r',encoding='UTF-8') as train:                    
                 for key,value in dictionary:                                    #写入unigram词典文件
                     if key is not "start":
                         uniDictFile.write(key+"\t"+str(value)+"\r\n")
+
                 dictionary=biDict.items()
                 dictionary=sorted(dictionary)
                 for key,value in dictionary:                                    #写入bigram词典文件
                     biDictFile.write(key+"\t"+str(value)+"\r\n")
+
                 dictionary=triDict.items()
                 dictionary=sorted(dictionary)
                 for key,value in dictionary:                                    #写入trigram词典文件
